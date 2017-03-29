@@ -13,7 +13,7 @@ public class MyPanel extends JPanel {
 	private static final int TOTAL_COLUMNS = 9;
 	private static final int TOTAL_ROWS = 9; // Last row has only one cell
 	private static final int NUM_BOMBS = 10;
-	private static boolean PLAYER_LOST = false;
+	public boolean PLAYER_LOST = false;
 	public int x = -1;
 	public int y = -1;
 	public int mouseDownGridX = 0;
@@ -21,7 +21,8 @@ public class MyPanel extends JPanel {
 	public Color[][] colorArray = new Color[TOTAL_COLUMNS][TOTAL_ROWS];
 	public boolean[][] bombPlacement = new boolean[TOTAL_COLUMNS][TOTAL_ROWS];
 	public boolean[][] notClickable = new boolean[TOTAL_COLUMNS][TOTAL_ROWS];
-	
+	public int[][] bombsAroundGrid = new int[TOTAL_COLUMNS][TOTAL_ROWS];
+
 	private Random randomNum = new Random();
 
 	public MyPanel() {
@@ -39,14 +40,16 @@ public class MyPanel extends JPanel {
 
 		for (int x = 0; x < TOTAL_COLUMNS; x++) { // The rest of the grid
 			for (int y = 0; y < TOTAL_ROWS; y++) {
+				colorArray[x][y] = Color.GRAY;
 				if(bombPlacement[x][y]) {
 					colorArray[x][y] = Color.BLACK;
-				} else {
-					colorArray[x][y] = Color.GRAY;
 				}
 			}
 		}
 	}
+
+	// number of squares needed to win the game
+	public int numOfSquaresToWin = (TOTAL_ROWS * TOTAL_COLUMNS) - NUM_BOMBS;
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -68,6 +71,11 @@ public class MyPanel extends JPanel {
 		// By default, the grid will be 10x10 (see above: TOTAL_COLUMNS and
 		// TOTAL_ROWS)
 		g.setColor(Color.BLACK);
+
+		if (PLAYER_LOST) {
+			g.drawString("Game Over", 50, 15);
+		}
+
 		for (int y = 0; y <= TOTAL_ROWS; y++) {
 			g.drawLine(x1 + GRID_X, y1 + GRID_Y + (y * (INNER_CELL_SIZE + 1)),
 					x1 + GRID_X + ((INNER_CELL_SIZE + 1) * TOTAL_COLUMNS), y1 + GRID_Y + (y * (INNER_CELL_SIZE + 1)));
@@ -76,10 +84,6 @@ public class MyPanel extends JPanel {
 			g.drawLine(x1 + GRID_X + (x * (INNER_CELL_SIZE + 1)), y1 + GRID_Y,
 					x1 + GRID_X + (x * (INNER_CELL_SIZE + 1)), y1 + GRID_Y + ((INNER_CELL_SIZE + 1) * (TOTAL_ROWS)));
 		}
-
-		// Draw an additional cell at the bottom left
-		// g.drawRect(x1 + GRID_X, y1 + GRID_Y + ((INNER_CELL_SIZE + 1) *
-		// (TOTAL_ROWS - 1)), INNER_CELL_SIZE + 1, INNER_CELL_SIZE + 1);
 
 		// Paint cell colors
 		for (int x = 0; x < TOTAL_COLUMNS; x++) {
@@ -108,8 +112,8 @@ public class MyPanel extends JPanel {
 			return -1;
 		}
 		x = x / (INNER_CELL_SIZE + 1);
-		y = y / (INNER_CELL_SIZE + 1);	
-		if (x < 0 || x >= TOTAL_COLUMNS || y < 0 || y >= TOTAL_ROWS) {   //Outside the rest of the grid
+		y = y / (INNER_CELL_SIZE + 1);
+		if (x < 0 || x >= TOTAL_COLUMNS || y < 0 || y >= TOTAL_ROWS) {
 			return -1;
 		}
 		return x;
@@ -132,7 +136,7 @@ public class MyPanel extends JPanel {
 		}
 		x = x / (INNER_CELL_SIZE + 1);
 		y = y / (INNER_CELL_SIZE + 1);
-		if (x < 0 || x >= TOTAL_COLUMNS || y < 0 || y >= TOTAL_ROWS) {   //Outside the rest of the grid
+		if (x < 0 || x >= TOTAL_COLUMNS || y < 0 || y >= TOTAL_ROWS) {
 			return -1;
 		}
 		return y;
@@ -149,12 +153,12 @@ public class MyPanel extends JPanel {
 			}
 		}
 	}
-	
-	public boolean isGameOver() {
-		return PLAYER_LOST;
+
+	public int getNumColumns() {
+		return TOTAL_COLUMNS;
 	}
-	
-	public void gameOver() {
-		PLAYER_LOST = true;
+
+	public int getNumRows() {
+		return TOTAL_ROWS;
 	}
 }
